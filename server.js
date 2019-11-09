@@ -1,6 +1,8 @@
 const express = require('express');
 const hbs = require('hbs');
 const fs = require('fs');
+const printFocusedMap = require('./utils/printFocusedMap');
+const path = require('path');
 
 const port = process.env.PORT || 3000;
 var app = express();
@@ -56,6 +58,31 @@ app.get('/projects', (req, res) => {
 
 app.get('/bad', (req, res) => {
     res.send('Unable to process requrest');
+});
+
+app.get('/what', (req, res) => {
+    if(!req.query.address){
+        res.send('nope');
+    } else {
+        printFocusedMap(req.query.address, (error, data) => {
+            var options = {
+                root: path.join(__dirname, 'img'),
+                dotfiles: 'deny',
+                headers: {
+                  'x-timestamp': Date.now(),
+                  'x-sent': true
+                }
+            };                   
+            res.set('Content-Type', 'image/png');
+            res.sendFile(data, options, function (err) {
+                if (err) {
+                  next(err)
+                } else {
+                  console.log('Sent:', data)
+                }
+            });
+        });
+    }
 });
 
 app.listen(port, () => {
