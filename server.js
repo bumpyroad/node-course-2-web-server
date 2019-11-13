@@ -60,29 +60,38 @@ app.get('/bad', (req, res) => {
     res.send('Unable to process requrest');
 });
 
-app.get('/what', (req, res) => {
-    if(!req.query.address){
-        res.send('nope');
-    } else {
-        printFocusedMap(req.query.address, (error, data) => {
-            var options = {
-                root: path.join(__dirname, 'img'),
-                dotfiles: 'deny',
-                headers: {
-                  'x-timestamp': Date.now(),
-                  'x-sent': true
-                }
-            };                   
-            res.set('Content-Type', 'image/png');
-            res.sendFile(data, options, function (err) {
-                if (err) {
-                  next(err)
-                } else {
-                  console.log('Sent:', data)
-                }
-            });
+app.get('/focusmap', (req, res) => {
+    res.render('focusmap.hbs', {
+
+    });
+});
+
+app.get('/map', (req, res) => {
+
+    // Get the posted json of tree work
+    let relLocation = req.protocol + '://' + req.hostname + ':' + port;
+
+    // Callback will take the screenshot and send it
+    printFocusedMap(req.query, relLocation, (error, data) => {
+        var options = {
+            root: path.join(__dirname, 'img'),
+            dotfiles: 'deny',
+            headers: {
+                'x-timestamp': Date.now(),
+                'x-sent': true
+            }
+        };
+                         
+        res.set('Content-Type', 'image/png');
+        res.sendFile(data, options, function (err) {
+            if (err) {
+                next(err)
+            } else {
+                console.log('Sent:', data)
+            }
         });
-    }
+        
+    });    
 });
 
 app.listen(port, () => {

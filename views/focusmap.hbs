@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Focused Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./js/leaflet/leaflet.css" />
+    <script src="./js/leaflet/leaflet.js"></script>
+    <script src="./js/esri-leaflet/esri-leaflet.js"></script>
+</head>
+
+<body>
+    <div id="mapid" style="width: 600px; height: 400px;"></div>
+    <script>
+        console.log('here we go the first time');
+
+        /*function getUrlVars(){
+            var vars = {};
+            var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            vars[key] = value;
+            });
+            return vars;  
+        }*/
+
+        const privateStreetURL = 'https://services2.arcgis.com/KCFBdu4OIPKQGsVV/arcgis/rest/services/private_streets/FeatureServer/0';
+        const treeGeneralFundURL = 'https://gis.visualizedot.com/arcgis/rest/services/Trees/Trees/FeatureServer/2';
+        const map = L.map('mapid', {
+            center: [37.322564, -121.861725],
+            zoom: 18
+        });
+
+        L.esri.basemapLayer('Topographic').addTo(map);
+
+        let treeIcon = L.icon({
+            iconUrl: 'http://i.imgur.com/hct8OpJ.png',
+            iconSize: [27,27]
+        });
+        
+        var treeGFLayer = L.esri.featureLayer({
+            url: treeGeneralFundURL,
+            minZoom: 17,
+            maxZoom: 19,
+            pointToLayer: function(geojson, latlng){
+                return L.marker(latlng, {
+                    icon: treeIcon
+                });
+            }
+        }).addTo(map);
+        
+        console.log('here we go!!');
+        console.log(window.location.href);
+
+    </script>
+</body >
+</html >

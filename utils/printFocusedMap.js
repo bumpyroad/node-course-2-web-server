@@ -1,16 +1,16 @@
 const puppeteer = require('puppeteer');
 const uuidv1 = require('uuid/v1');
 
-const printFocusedMap = (address, callback) => {
-    
+const printFocusedMap = (requestQuery, relLocation, callback) => {
+
     let imgName = uuidv1() + '.png';
     (async () => {
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.goto('https://www.google.com');
-        await page.screenshot({path: './img/' +  imgName});      
-        await browser.close();
-        callback(undefined, imgName);
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.goto(relLocation + '/focusmap' + '?d=' + requestQuery, {"waitUntil":"networkidle0"});
+      await page.screenshot({path: './img/' +  imgName});
+      await browser.close();
+      callback(undefined, imgName);
       })();
       //callback(undefined, 'printing is under way');
       console.log('I am working on it.');
