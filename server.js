@@ -36,7 +36,6 @@ hbs.registerHelper('screamIt', (text) => {
     return text.toUpperCase();
 });
 
-
 app.get('/', (req, res) => {
     res.render('home.hbs', {
         pageTitle: 'Home Page',
@@ -50,6 +49,8 @@ app.get('/about', (req, res) => {
     });
 });
 
+
+
 app.get('/projects', (req, res) => {
     res.render('projects.hbs', {
         pageTitle: 'Projects',
@@ -61,8 +62,8 @@ app.get('/bad', (req, res) => {
 });
 
 app.get('/focusmap', (req, res) => {
-    res.render('focusmap.hbs', {
-
+    res.render('focusmap.hbs', {        
+        treeMarkers : JSON.stringify(decodeURI(req.query.d)),
     });
 });
 
@@ -72,7 +73,7 @@ app.get('/map', (req, res) => {
     let relLocation = req.protocol + '://' + req.hostname + ':' + port;
 
     // Callback will take the screenshot and send it
-    printFocusedMap(req.query, relLocation, (error, data) => {
+    printFocusedMap(req.query.mapdata, relLocation, (error, data) => {
         var options = {
             root: path.join(__dirname, 'img'),
             dotfiles: 'deny',
