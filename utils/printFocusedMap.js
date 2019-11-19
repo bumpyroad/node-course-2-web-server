@@ -12,8 +12,6 @@ const printFocusedMap = (requestQueryObject, relLocation, callback) => {
       await browser.close();
       callback(undefined, imgName);
       })();
-      //callback(undefined, 'printing is under way');
-      console.log('I am working on it.');
 }    
 
 module.exports = printFocusedMap;

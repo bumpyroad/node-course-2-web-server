@@ -1,0 +1,10 @@
+.dot-green {
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: .125rem solid;
+    display: inline-block;
+    background-color: green;
+    width: 1rem;
+    height: 1rem;
+    border-width: .0625rem;
+}

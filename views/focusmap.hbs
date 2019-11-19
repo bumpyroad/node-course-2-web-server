@@ -6,12 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./js/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="./styles/markers.css"/>
     <script src="./js/leaflet/leaflet.js"></script>
-    <script src="./js/esri-leaflet/esri-leaflet.js"></script>
+    <script src="./js/esri-leaflet/esri-leaflet.js"></script>    
 </head>
 
 <body>
-    <div id="mapid" style="width: 600px; height: 400px;"></div>
+    <div id="mapid" style="width: 800px; height: 600px;"></div>
     <script>
         /*function getUrlVars(){
             var vars = {};
@@ -23,32 +24,58 @@
         /* variables filled in by the calling process
         */
 
-        var treeMarkerJSON = {{{treeMarkers}}};        
+        var treeList = {{{treeMarkers}}};
+        var lat = treeList.treeWork[0].lat;
+        var lng = treeList.treeWork[0].lng;
+
+        // This should center to Pasig
+        //14.575242, 121.085468
+
 
         const privateStreetURL = 'https://services2.arcgis.com/KCFBdu4OIPKQGsVV/arcgis/rest/services/private_streets/FeatureServer/0';
         const treeGeneralFundURL = 'https://gis.visualizedot.com/arcgis/rest/services/Trees/Trees/FeatureServer/2';
         const map = L.map('mapid', {
-            center: [37.322564, -121.861725],
-            zoom: 18
+            center: [lat, lng],
+            zoom: 19,
+            attributionControl: false,
+            zoomControl: false
         });
 
         L.esri.basemapLayer('Topographic').addTo(map);
 
-        let treeIcon = L.icon({
+        let selectedTreeIcon = L.icon({
             iconUrl: 'http://i.imgur.com/hct8OpJ.png',
             iconSize: [27,27]
         });
+
+        var standardDivIcon = L.divIcon({className: 'dot-green'});
         
+        // Present the general tree layer
         var treeGFLayer = L.esri.featureLayer({
             url: treeGeneralFundURL,
-            minZoom: 17,
-            maxZoom: 19,
+            minZoom: 19,
+            maxZoom: 21,
             pointToLayer: function(geojson, latlng){
                 return L.marker(latlng, {
-                    icon: treeIcon
+                    icon: standardDivIcon
                 });
             }
         }).addTo(map);
+
+        // Highlight trees passed in
+        // save the marker coords so you can set the map boundaries
+        var boundaryList = [];
+        treeList.treeWork.forEach((tree) => {
+            L.marker(
+                [tree.lat, tree.lng], 
+                {icon: selectedTreeIcon}
+            ).addTo(map)
+            .bindPopup(tree.workDesc,{autoClose: false}).openPopup();        
+            boundaryList.push([tree.lat, tree.lng]);
+        });
+        map.fitBounds(boundaryList);
+        
+        
         
     </script>
 </body >

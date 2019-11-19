@@ -58,40 +58,49 @@ app.get('/projects', (req, res) => {
 });
 
 app.get('/bad', (req, res) => {
-    res.send('Unable to process requrest');
+    res.send('Unable to process request');
 });
 
 app.get('/focusmap', (req, res) => {
+    
+    // focusmap will parse the JSON received
+    // and use it to make a map.
     res.render('focusmap.hbs', {        
-        treeMarkers : JSON.stringify(decodeURI(req.query.d)),
+        treeMarkers : req.query.d,
     });
 });
 
 app.get('/map', (req, res) => {
 
-    // Get the posted json of tree work
+    //Pass it /?mapdata=( A JSON object of things to map)
+    // It will send that object to the map page as /?d=( A JSON object of things to map)
+
+    // This is the site where the map resides
     let relLocation = req.protocol + '://' + req.hostname + ':' + port;
 
-    // Callback will take the screenshot and send it
+    // Callback will take the screenshot of that map and send it as an image
     printFocusedMap(req.query.mapdata, relLocation, (error, data) => {
-        var options = {
-            root: path.join(__dirname, 'img'),
-            dotfiles: 'deny',
-            headers: {
-                'x-timestamp': Date.now(),
-                'x-sent': true
-            }
-        };
+        //if(error != undefined){
+            var options = {
+                root: path.join(__dirname, 'img'),
+                dotfiles: 'deny',
+                headers: {
+                    'x-timestamp': Date.now(),
+                    'x-sent': true
+                }
+            };
                          
-        res.set('Content-Type', 'image/png');
-        res.sendFile(data, options, function (err) {
-            if (err) {
-                next(err)
-            } else {
-                console.log('Sent:', data)
-            }
-        });
-        
+            res.set('Content-Type', 'image/png');
+            res.sendFile(data, options, function (err) {
+                if (err) {
+                    next(err)
+                } else {
+                    console.log('Sent:', data)
+                }
+            });
+        //} else {
+        //    res.send('Unable to process request');
+        //}        
     });    
 });
 
