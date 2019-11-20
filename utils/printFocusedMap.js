@@ -5,7 +5,7 @@ const printFocusedMap = (requestQueryObject, relLocation, callback) => {
 
     let imgName = uuidv1() + '.png';
     (async () => {
-      const browser = await puppeteer.launch();
+      const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
       const page = await browser.newPage();
       await page.goto(relLocation + '/focusmap' + '?d=' + requestQueryObject, {"waitUntil":"networkidle0"});
       await page.screenshot({path: './img/' +  imgName});
