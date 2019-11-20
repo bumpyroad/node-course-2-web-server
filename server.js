@@ -80,6 +80,8 @@ app.get('/map', (req, res) => {
 
     // Callback will take the screenshot of that map and send it as an image
     printFocusedMap(req.query.mapdata, relLocation, (error, data) => {
+        res.send('OK, I should be finished shortly');
+        /*
         //if(error != undefined){
             var options = {
                 root: path.join(__dirname, 'img'),
@@ -100,7 +102,8 @@ app.get('/map', (req, res) => {
             });
         //} else {
         //    res.send('Unable to process request');
-        //}        
+        //}
+        */        
     });    
 });
 

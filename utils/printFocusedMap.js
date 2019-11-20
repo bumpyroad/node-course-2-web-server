@@ -9,9 +9,9 @@ const printFocusedMap = (requestQueryObject, relLocation, callback) => {
       const page = await browser.newPage();
       await page.goto(relLocation + '/focusmap' + '?d=' + requestQueryObject, {"waitUntil":"networkidle0"});
       await page.screenshot({path: './img/' +  imgName});
-      await browser.close();
-      callback(undefined, imgName);
-      })();
+      await browser.close();      
+    })();
+    callback(undefined, imgName);
 }    
 
 module.exports = printFocusedMap;
