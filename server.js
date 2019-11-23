@@ -76,7 +76,10 @@ app.get('/map', (req, res) => {
     // It will send that object to the map page as /?d=( A JSON object of things to map)
 
     // This is the site where the map resides
-    let relLocation = req.protocol + '://' + req.hostname + ':' + port;
+    //let relLocation = req.protocol + '://' + req.hostname + ':' + port;
+    
+    // No port for the production version redirect
+    let relLocation = req.protocol + '://' + req.hostname;
 
     // Callback will take the screenshot of that map and send it as an image
     printFocusedMap(req.query.mapdata, relLocation, (error, data) => {
