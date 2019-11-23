@@ -3,7 +3,7 @@ const uuidv1 = require('uuid/v1');
 
 const printFocusedMap = (requestQueryObject, relLocation, callback) => {
 
-    let imgName = uuidv1() + '.png';
+    var imgName = uuidv1() + '.png';
     imgName = './img/' +  imgName;
     try {
       doScreenCapture(relLocation + '/focusmap' + '?d=' + requestQueryObject, imgName);
@@ -14,10 +14,12 @@ const printFocusedMap = (requestQueryObject, relLocation, callback) => {
 } 
 
 async function doScreenCapture(url, imageName){
+  console.log('url is: ' + url);
+  console.log('location :' + imageName);
   const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
   const page = await browser.newPage();
   //await page.goto(url, {"waitUntil":"networkidle0"});
-  await page.goto('http://www.google.com',{"waitUntil":"domcontentloaded"});
+  await page.goto(url,{"waitUntil":"domcontentloaded"});
   await page.screenshot({path: imageName})
   .then((result) => { console.log('Screen captured'); })
   .catch((e => { console.error(`That was a fail`, e); }));;
