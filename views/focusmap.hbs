@@ -31,8 +31,6 @@
         // This should center to Pasig
         //14.575242, 121.085468
 
-
-        const privateStreetURL = 'https://services2.arcgis.com/KCFBdu4OIPKQGsVV/arcgis/rest/services/private_streets/FeatureServer/0';
         const treeGeneralFundURL = 'https://gis.visualizedot.com/arcgis/rest/services/Trees/Trees/FeatureServer/2';
         const map = L.map('mapid', {
             center: [lat, lng],
@@ -62,20 +60,33 @@
             }
         }).addTo(map);
 
-        // Highlight trees passed in
-        // save the marker coords so you can set the map boundaries
-        var boundaryList = [];
+        var strQuery = '';
+        var tw = {};  // save the work type as an associative array so you can refer to it by id
         treeList.treeWork.forEach((tree) => {
-            L.marker(
-                [tree.lat, tree.lng], 
-                {icon: selectedTreeIcon}
-            ).addTo(map)
-            .bindPopup(tree.workDesc,{autoClose: false}).openPopup();        
-            boundaryList.push([tree.lat, tree.lng]);
+            strQuery += ' OBJECTID=' + tree.treeId + ' or';
+            strQuery += " FACILITYID='" + tree.treeId + "' or";
+            tw[tree.treeId] = tree.workDesc;
         });
-        map.fitBounds(boundaryList);
+        strQuery = strQuery.substring(0, strQuery.length -3);
+        var query = L.esri.query({ url: treeGeneralFundURL});
+        query.where(strQuery); 
+        console.log(strQuery);       
+        query.run(function(error, featureCollection, response){
+            if(error){ 
+                console.log(error);
+                return;
+            }
+            console.log('found ' + featureCollection.features.length + ' results' );
+            featureCollection.features.forEach((tree) => {                
+                L.marker(
+                    [tree.geometry.coordinates[1], tree.geometry.coordinates[0]], 
+                    {icon: selectedTreeIcon}
+                ).addTo(map)
+                .bindPopup(tw[tree.properties.OBJECTID],{autoClose: false}).openPopup();                
+            });
+        });
         
-        
+
         
     </script>
 </body >
