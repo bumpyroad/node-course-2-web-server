@@ -25,15 +25,11 @@
         */
 
         var treeList = {{{treeMarkers}}};
-        var lat = treeList.treeWork[0].lat;
-        var lng = treeList.treeWork[0].lng;
-
-        // This should center to Pasig
-        //14.575242, 121.085468
 
         const treeGeneralFundURL = 'https://gis.visualizedot.com/arcgis/rest/services/Trees/Trees/FeatureServer/2';
+
         const map = L.map('mapid', {
-            center: [lat, lng],
+            center: [37.363641, -121.874038],  // center at 1404 Mabury Rd
             zoom: 21,
             attributionControl: false,
             zoomControl: true
@@ -61,7 +57,7 @@
         }).addTo(map);
 
         var strQuery = '';
-        var tw = {};  // save the work type as an associative array so you can refer to it by id
+        var tw = {};  // save the work type as an associative array so you can refer to it by id. For the popups
         treeList.treeWork.forEach((tree) => {
             strQuery += ' OBJECTID=' + tree.treeId + ' or';
             strQuery += " FACILITYID='" + tree.treeId + "' or";
@@ -71,10 +67,14 @@
         var query = L.esri.query({ url: treeGeneralFundURL});
         query.where(strQuery);      
         query.run(function(error, featureCollection, response){
+            
             if(error){ 
                 console.log(error);
                 return;
             }
+            
+            // Add markers of features found in the query
+            // Popups are based on info passed in as parameter, not from the featurelayer
             featureCollection.features.forEach((tree) => {                
                 L.marker(
                     [tree.geometry.coordinates[1], tree.geometry.coordinates[0]], 
@@ -82,6 +82,11 @@
                 ).addTo(map)
                 .bindPopup(tw[tree.properties.OBJECTID],{autoClose: false}).openPopup();                
             });
+
+            // Zoom to the features found
+            var geojson = L.geoJSON(featureCollection);
+            map.fitBounds(geojson.getBounds());
+            
         });
         
 
