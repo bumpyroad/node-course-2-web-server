@@ -34,9 +34,9 @@
         const treeGeneralFundURL = 'https://gis.visualizedot.com/arcgis/rest/services/Trees/Trees/FeatureServer/2';
         const map = L.map('mapid', {
             center: [lat, lng],
-            zoom: 19,
+            zoom: 21,
             attributionControl: false,
-            zoomControl: false
+            zoomControl: true
         });
 
         L.esri.basemapLayer('Topographic').addTo(map);
@@ -69,14 +69,12 @@
         });
         strQuery = strQuery.substring(0, strQuery.length -3);
         var query = L.esri.query({ url: treeGeneralFundURL});
-        query.where(strQuery); 
-        console.log(strQuery);       
+        query.where(strQuery);      
         query.run(function(error, featureCollection, response){
             if(error){ 
                 console.log(error);
                 return;
             }
-            console.log('found ' + featureCollection.features.length + ' results' );
             featureCollection.features.forEach((tree) => {                
                 L.marker(
                     [tree.geometry.coordinates[1], tree.geometry.coordinates[0]], 
