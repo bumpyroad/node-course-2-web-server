@@ -4,7 +4,7 @@
 <head>
     <title>Focused Map</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="./js/leaflet/leaflet.css" />
     <link rel="stylesheet" href="./styles/markers.css"/>
     <script src="./js/leaflet/leaflet.js"></script>
@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <div id="mapid" style="width: 800px; height: 600px;"></div>
+    <div id="mapid"></div>
     <script>
         /*function getUrlVars(){
             var vars = {};
@@ -25,30 +25,33 @@
         */
 
         var treeList = {{{treeMarkers}}};
+        var lat = 37.363641;
+        var lng = -121.874038;
 
         const treeGeneralFundURL = 'https://gis.visualizedot.com/arcgis/rest/services/Trees/Trees/FeatureServer/2';
+        const parcelURL = 'https://gis.visualizedot.com/arcgis/rest/services/Basemaps/AddressesParcels/MapServer/1';
+        const addressLabelURL = 'https://gis.visualizedot.com/arcgis/rest/services/Basemaps/AddressesParcels/MapServer/0';
 
         const map = L.map('mapid', {
-            center: [37.363641, -121.874038],  // center at 1404 Mabury Rd
+            center: [lat, lng],  // center at 1404 Mabury Rd
             zoom: 21,
             attributionControl: false,
             zoomControl: true
         });
+        //L.esri.basemapLayer('Topographic').addTo(map);
 
-        L.esri.basemapLayer('Topographic').addTo(map);
-
+        
+        // General fund trees
         let selectedTreeIcon = L.icon({
             iconUrl: 'http://i.imgur.com/hct8OpJ.png',
             iconSize: [27,27]
         });
-
         var standardDivIcon = L.divIcon({className: 'dot-green'});
-        
+
         // Present the general tree layer
         var treeGFLayer = L.esri.featureLayer({
             url: treeGeneralFundURL,
             minZoom: 19,
-            maxZoom: 21,
             pointToLayer: function(geojson, latlng){
                 return L.marker(latlng, {
                     icon: standardDivIcon
@@ -56,15 +59,45 @@
             }
         }).addTo(map);
 
+        // Address labels
+        var addressLayer = L.esri.featureLayer({
+            url: addressLabelURL,
+            minZoom: 19                      
+        }).addTo(map);
+
+
+        var labels = {};
+
+        addressLayer.on('createfeature', function (e) {
+            var id = e.feature.id;
+            var feature = addressLayer.getFeature(id);
+            var center = feature.getLatLng();           
+            var label = L.marker(center, {
+            icon: L.divIcon({
+                iconSize: [1,1],
+                className: 'label',
+                html: '<div>' + e.feature.properties.ADDRNUM + '</div>'
+            })
+            }).addTo(map);
+            labels[id] = label;
+        });
+
+        // Parcels
+        L.esri.featureLayer({
+            url: parcelURL,
+            minZoom: 19                        
+        }).addTo(map);
+
         var strQuery = '';
         var tw = {};  // save the work type as an associative array so you can refer to it by id. For the popups
         treeList.treeWork.forEach((tree) => {
-            strQuery += ' OBJECTID=' + tree.treeId + ' or';
+            //strQuery += ' OBJECTID=' + tree.treeId + ' or';
             strQuery += " FACILITYID='" + tree.treeId + "' or";
             tw[tree.treeId] = tree.workDesc;
         });
         strQuery = strQuery.substring(0, strQuery.length -3);
         var query = L.esri.query({ url: treeGeneralFundURL});
+
         query.where(strQuery);      
         query.run(function(error, featureCollection, response){
             
@@ -72,25 +105,24 @@
                 console.log(error);
                 return;
             }
+
+            // Zoom to the features found
+            var geojson = L.geoJSON(featureCollection);
+            map.fitBounds(geojson.getBounds(),{padding: [50,50]});
             
             // Add markers of features found in the query
             // Popups are based on info passed in as parameter, not from the featurelayer
-            featureCollection.features.forEach((tree) => {                
+            featureCollection.features.forEach((tree) => {                     
                 L.marker(
                     [tree.geometry.coordinates[1], tree.geometry.coordinates[0]], 
                     {icon: selectedTreeIcon}
                 ).addTo(map)
-                .bindPopup(tw[tree.properties.OBJECTID],{autoClose: false}).openPopup();                
+                .bindPopup(tw[tree.properties.FACILITYID],{autoClose: false}).openPopup();                                    
             });
+                 
+                  
+        });     
 
-            // Zoom to the features found
-            var geojson = L.geoJSON(featureCollection);
-            map.fitBounds(geojson.getBounds());
-            
-        });
-        
-
-        
     </script>
 </body >
 </html >

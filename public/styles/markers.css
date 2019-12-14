@@ -8,3 +8,15 @@
     height: 1rem;
     border-width: .0625rem;
 }
+
+#mapid {
+    width: 800px; 
+    height: 575px;
+}
+
+.label {
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: -1em;
+}
