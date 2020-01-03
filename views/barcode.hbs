@@ -10,7 +10,10 @@
     <svg id="barcode"></svg>
     <script>
         var barcodeContent = {{json bcContent}};
-        JsBarcode("#barcode", barcodeContent);
+        JsBarcode("#barcode", barcodeContent, {
+                height: 40,
+                displayValue : false
+            });
     </script>  
 </body>
 

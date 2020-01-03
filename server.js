@@ -2,6 +2,7 @@ const express = require('express');
 const hbs = require('hbs');
 const fs = require('fs');
 const printFocusedMap = require('./utils/printFocusedMap');
+const printBarcode = require('./utils/printBarcode');
 const path = require('path');
 
 const port = process.env.PORT || 3000;
@@ -77,16 +78,44 @@ app.get('/focusmap', (req, res) => {
     });
 });
 
+app.get('/bc', (req, res) => {
+
+    let relLocation = req.protocol + '://' + req.hostname + ':' + port;    
+    // No port for the production version redirect
+    //let relLocation = req.protocol + '://' + req.hostname;
+
+    printBarcode(req.query.codeContent, relLocation, (error, data) => {
+        var options = {
+            root: path.join(__dirname, 'img'),
+            dotfiles: 'deny',
+            headers: {
+                'x-timestamp': Date.now(),
+                'x-sent': true
+            }
+        };
+                     
+        res.set('Content-Type', 'image/png');
+        res.sendFile(data, options, function (err) {
+            if (err) {
+                res.send(err);
+            } else {
+                console.log('Sent:', data)
+            }
+        });    
+    });
+    
+});
+
 app.get('/map', (req, res) => {
 
     //Pass it /?mapdata=( A JSON object of things to map)
     // It will send that object to the map page as /?d=( A JSON object of things to map)
 
     // This is the site where the map resides
-    //let relLocation = req.protocol + '://' + req.hostname + ':' + port;
+    let relLocation = req.protocol + '://' + req.hostname + ':' + port;
     
     // No port for the production version redirect
-    let relLocation = req.protocol + '://' + req.hostname;
+    //let relLocation = req.protocol + '://' + req.hostname;
 
     // Callback will take the screenshot of that map and send it as an image
     printFocusedMap(req.query.mapdata, relLocation, (error, data) => {
