@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="./js/JsBarcode.code128.min.js"></script>    
+</head>
+
+<body>
+    <svg id="barcode"></svg>
+    <script>
+        var barcodeContent = {{json bcContent}};
+        JsBarcode("#barcode", barcodeContent);
+    </script>  
+</body>
+
+</html>

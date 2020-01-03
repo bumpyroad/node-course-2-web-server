@@ -35,6 +35,9 @@ hbs.registerHelper('getCurrentYear', () => {
 hbs.registerHelper('screamIt', (text) => {
     return text.toUpperCase();
 });
+hbs.registerHelper('json', (obj) => {
+    return new hbs.SafeString(JSON.stringify(obj));
+});
 
 app.get('/', (req, res) => {
     res.render('home.hbs', {
@@ -49,7 +52,11 @@ app.get('/about', (req, res) => {
     });
 });
 
-
+app.get('/barcode', (req, res) => {
+    res.render('barcode.hbs', {
+        bcContent : req.query.d,
+    });
+});
 
 app.get('/projects', (req, res) => {
     res.render('projects.hbs', {
