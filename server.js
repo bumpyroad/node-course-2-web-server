@@ -1,9 +1,13 @@
 const express = require('express');
 const hbs = require('hbs');
 const fs = require('fs');
+
 const printFocusedMap = require('./utils/printFocusedMap');
 const printBarcode = require('./utils/printBarcode');
 const path = require('path');
+
+const JsBarcode = require('jsbarcode');
+const Canvas = require('canvas');
 
 const port = process.env.PORT || 3000;
 var app = express();
@@ -57,6 +61,14 @@ app.get('/barcode', (req, res) => {
     res.render('barcode.hbs', {
         bcContent : req.query.d,
     });
+});
+
+app.get('/barcode2', (req, res) => {
+    var canvas = Canvas.createCanvas();
+    JsBarcode(canvas, "Hello");
+    var imgPathAndName = './img/testImage.jpg';
+    res.sendFile(canvas.toDataURL('image/png'));
+    console.log('did that work');
 });
 
 app.get('/projects', (req, res) => {

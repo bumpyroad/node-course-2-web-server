@@ -107,20 +107,32 @@
             }
 
             // Zoom to the features found
-            var geojson = L.geoJSON(featureCollection);
-            map.fitBounds(geojson.getBounds(),{padding: [50,50]});
+            if(featureCollection.features.length == 0){
+                console.log('No matches found in inventory');
+            } else if(featureCollection.features.length == 1){
+                let foundPt = featureCollection.features[0];
+                let foundPtLat = foundPt.geometry.coordinates[1];
+                let foundPtLng = foundPt.geometry.coordinates[0];
+                map.setView(L.latLng(foundPtLat, foundPtLng), 19);
+            } else if(featureCollection.features.length > 1){
+                let geojson = L.geoJSON(featureCollection);                
+                map.fitBounds(geojson.getBounds(),{padding: [50,50]});
+            }
+                     
             
             // Add markers of features found in the query
             // Popups are based on info passed in as parameter, not from the featurelayer
-            featureCollection.features.forEach((tree) => {                     
-                L.marker(
-                    [tree.geometry.coordinates[1], tree.geometry.coordinates[0]], 
-                    {icon: selectedTreeIcon}
-                ).addTo(map)
-                .bindPopup(tw[tree.properties.FACILITYID],{autoClose: false}).openPopup();                                    
-            });
-                 
-                  
+            featureCollection.features.forEach((tree) => {
+                try {                     
+                    L.marker(
+                        [tree.geometry.coordinates[1], tree.geometry.coordinates[0]], 
+                        {icon: selectedTreeIcon}
+                    ).addTo(map)
+                    .bindPopup(tw[tree.properties.FACILITYID],{autoClose: false}).openPopup(); 
+                } catch(e){
+                    console.error('unable to map point ' + e);
+                }
+            });                  
         });     
 
     </script>
